@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import SakuraCanvas from './SakuraCanvas';
 
 function VideoPlayer({ src, teamName }) {
     const videoRef = useRef(null);
@@ -111,6 +112,7 @@ function App() {
             alignItems: 'center',
             height: '100vh'
         }}>
+            <SakuraCanvas />
             <VideoPlayer src="1.mp4" teamName="Team1" />
             <VideoPlayer src="1.mp4" teamName="Team2" />
             <VideoPlayer src="1.mp4" teamName="Team3" />
