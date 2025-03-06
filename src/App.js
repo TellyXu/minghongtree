@@ -1,36 +1,42 @@
 import React, { useRef, useState } from 'react';
 import SakuraCanvas from './SakuraCanvas';
 
-function VideoPlayer({ src, teamName }) {
+function VideoPlayer({ src, teamName, resetTrigger }) {
     const videoRef = useRef(null);
     const [duration, setDuration] = useState(null);
-    // phase 表示当前点击次数：0 表示还未播放；1 播放完第一段；2 播放完第二段；3 播放完最终段
     const [phase, setPhase] = useState(0);
     const [targetTime, setTargetTime] = useState(0);
     const [isDone, setIsDone] = useState(false);
 
-    // 获取视频总时长
+    React.useEffect(() => {
+        if (resetTrigger) {
+            setPhase(0);
+            setTargetTime(0);
+            setIsDone(false);
+            if (videoRef.current) {
+                videoRef.current.currentTime = 0;
+                videoRef.current.pause();
+            }
+        }
+    }, [resetTrigger]);
+
     const handleLoadedMetadata = () => {
         if (videoRef.current) {
             setDuration(videoRef.current.duration);
         }
     };
 
-    // 点击按钮控制播放区间
     const handleButtonClick = () => {
         if (!duration) return;
-        if (isDone) return; // 播放完毕后不再操作
+        if (isDone) return;
 
         let newPhase = phase + 1;
         let newTargetTime = 0;
         if (newPhase === 1) {
-            // 第一次点击：播放前1/4
             newTargetTime = duration / 4;
         } else if (newPhase === 2) {
-            // 第二次点击：播放下1/4（即前半部分）
             newTargetTime = duration / 2;
         } else if (newPhase === 3) {
-            // 第三次点击：播放剩余部分直到结束
             newTargetTime = duration;
         } else {
             return;
@@ -40,8 +46,6 @@ function VideoPlayer({ src, teamName }) {
         videoRef.current.play();
     };
 
-    // 监听播放进度，一旦达到目标时间就暂停，
-    // 如果是最终播放（phase===3），则标记为完成
     const handleTimeUpdate = () => {
         if (videoRef.current && videoRef.current.currentTime >= targetTime) {
             videoRef.current.pause();
@@ -51,16 +55,15 @@ function VideoPlayer({ src, teamName }) {
         }
     };
 
-    // 禁止点击视频手动播放
     const handleVideoClick = (e) => {
         e.preventDefault();
     };
 
     const buttonText = isDone
-        ? "Done"
+        ? "Blossom!"
         : phase < 2
-            ? "Next Progress"
-            : "Final Progress";
+            ? "Bloom"
+            : "Bloom";
 
     const buttonStyle = {
         marginTop: '10px',
@@ -79,10 +82,25 @@ function VideoPlayer({ src, teamName }) {
             padding: '10px',
             margin: '10px',
             width: '340px',
-            textAlign: 'center'
+            textAlign: 'center',
+            position: 'relative'
         }}>
-            {/* 在视频上方显示团队名称 */}
-            <div style={{ marginBottom: '10px', fontWeight: 'bold', fontSize: '18px' }}>
+            {/* 改进的团队名称标题样式 */}
+            <div style={{
+                position: 'absolute',
+                top: '-15px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: '#f8f9fa',
+                padding: '5px 15px',
+                borderRadius: '20px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                color: '#2c3e50',
+                zIndex: 1,
+                border: '1px solid #e9ecef'
+            }}>
                 {teamName}
             </div>
             <video
@@ -93,7 +111,7 @@ function VideoPlayer({ src, teamName }) {
                 onClick={handleVideoClick}
                 width="320"
                 height="240"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '8px', marginTop: '15px' }}
             />
             <br />
             <button onClick={handleButtonClick} style={buttonStyle} disabled={isDone}>
@@ -104,18 +122,45 @@ function VideoPlayer({ src, teamName }) {
 }
 
 function App() {
+    const [resetCounter, setResetCounter] = useState(0);
+
+    const handleResetAll = () => {
+        setResetCounter(prev => prev + 1);
+    };
+
+    const resetButtonStyle = {
+        padding: '10px 20px',
+        margin: '20px',
+        backgroundColor: '#e74c3c',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        fontWeight: 'bold'
+    };
+
     return (
         <div style={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh'
         }}>
             <SakuraCanvas />
-            <VideoPlayer src="1.mp4" teamName="Team1" />
-            <VideoPlayer src="1.mp4" teamName="Team2" />
-            <VideoPlayer src="1.mp4" teamName="Team3" />
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
+                <VideoPlayer src="1.mp4" teamName="Team1" resetTrigger={resetCounter} />
+                <VideoPlayer src="1.mp4" teamName="Team2" resetTrigger={resetCounter} />
+                <VideoPlayer src="1.mp4" teamName="Team3" resetTrigger={resetCounter} />
+            </div>
+            <button onClick={handleResetAll} style={resetButtonStyle}>
+                Reset All
+            </button>
         </div>
     );
 }
