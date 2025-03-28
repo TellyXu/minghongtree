@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import SakuraCanvas from './SakuraCanvas';
+import backgroundImage from './images/background.png';
 
 function VideoPlayer({ src, teamName, resetTrigger }) {
     const videoRef = useRef(null);
@@ -78,12 +79,13 @@ function VideoPlayer({ src, teamName, resetTrigger }) {
     return (
         <div style={{
             borderRadius: '8px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
             padding: '10px',
             margin: '10px',
-            width: '340px',
+            width: '280px',
             textAlign: 'center',
-            position: 'relative'
+            position: 'relative',
+            backgroundColor: 'white'
         }}>
             {/* 改进的团队名称标题样式 */}
             <div style={{
@@ -109,9 +111,13 @@ function VideoPlayer({ src, teamName, resetTrigger }) {
                 onLoadedMetadata={handleLoadedMetadata}
                 onTimeUpdate={handleTimeUpdate}
                 onClick={handleVideoClick}
-                width="320"
-                height="240"
-                style={{ borderRadius: '8px', marginTop: '15px' }}
+                width="260"
+                height="195"
+                style={{ 
+                    borderRadius: '8px', 
+                    marginTop: '15px',
+                    clipPath: 'inset(0 0 10px 0)'
+                }}
             />
             <br />
             <button onClick={handleButtonClick} style={buttonStyle} disabled={isDone}>
@@ -145,7 +151,11 @@ function App() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            height: '100vh'
+            height: '100vh',
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
         }}>
             <SakuraCanvas />
             <div style={{
